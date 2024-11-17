@@ -20,10 +20,7 @@ const Quiz = () => {
   const [randomQuestions, setRandomQuestions] = useState(getRandomQuestions(selectedNumberOfQuestions));
 
   useEffect(() => {
-    setRandomQuestions(getRandomQuestions(selectedNumberOfQuestions));
-    setCurrentQuestion(0);  // Reset to the first question whenever the number of questions changes
-    setAnswers({});
-    setShowScore(false);
+    restartQuiz();
   }, [selectedNumberOfQuestions, randomizeQuestions]);
 
 
@@ -67,6 +64,7 @@ const Quiz = () => {
   };
 
   const restartQuiz = () => {
+    setRandomQuestions(getRandomQuestions(selectedNumberOfQuestions));
     setAnswers({});
     setCurrentQuestion(0);
     setShowScore(false);
@@ -84,8 +82,11 @@ const Quiz = () => {
                 labelId="question-count-label"
                 value={selectedNumberOfQuestions}
                 label="Questions"
-                onChange={(e) => setSelectedNumberOfQuestions(e.target.value)}
-                >
+                onChange={(e) => {
+                    const n = e.target.value;
+                    setSelectedNumberOfQuestions(n)
+                    setRandomQuestions(getRandomQuestions(n))
+                }}>
                 {[5, 10, 15, 20, 23, ...Array.from({ length: questions.length - 23 }, (_, i) => i + 24)].map((num) => (
                     <MenuItem key={num} value={num}>
                     {num}
@@ -107,43 +108,48 @@ const Quiz = () => {
             </FormControl>
         </Box>
 
-      {showScore ? (
+      {showScore &&
         <ScoreReport
           score={score}
           totalQuestions={randomQuestions.length}
           incorrectQuestions={incorrectQuestions}
           answers={answers}
           questions={questions}
-          restartQuiz={restartQuiz}
-        />
-      ) : (
-        <>
-          <QuestionCard
+          hide={() => setShowScore(false)}
+        />}
+
+        <QuestionCard
             question={randomQuestions[currentQuestion]}
             selectedAnswer={answers[randomQuestions[currentQuestion].question_id] || ""}
             handleAnswer={handleAnswer}
-          />
-          <Box mt={4} display="flex" justifyContent="center">
-            <Pagination
-              count={randomQuestions.length}
-              page={currentQuestion + 1}
-              onChange={handlePageChange}
-              color="primary"
-              siblingCount={1}
-              boundaryCount={1}
-            />
-          </Box>
-          <Box mt={2} textAlign="center">
+            finished={showScore}
+        />
+        <Box mt={4} display="flex" justifyContent="center">
+        <Pagination
+            count={randomQuestions.length}
+            page={currentQuestion + 1}
+            onChange={handlePageChange}
+            color="primary"
+            siblingCount={1}
+            boundaryCount={1}
+        />
+        </Box>
+        <Box display="flex" justifyContent="center" mt={2} gap={4} textAlign="center">
             <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => setShowScore(true)}
+                variant="contained"
+                color="warning"
+                onClick={restartQuiz}
             >
-              Finish Quiz
+                Restart Quiz
             </Button>
-          </Box>
-        </>
-      )}
+            <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setShowScore(true)}
+            >
+                Show Results
+            </Button>
+        </Box>
     </Box>
   );
 };

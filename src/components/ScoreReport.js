@@ -3,11 +3,11 @@ import { Box, Typography, List, ListItem, ListItemText, Button } from "@mui/mate
 
 const MainImagesPath = `${process.env.PUBLIC_URL}/kns_fotos`;
 
-const ScoreReport = ({ score, totalQuestions, incorrectQuestions, answers, restartQuiz }) => {
+const ScoreReport = ({ score, totalQuestions, incorrectQuestions, answers, hide }) => {
   return (
     <Box textAlign="center">
       <Typography variant="h4" gutterBottom>
-        Your Score: {score} / {totalQuestions}
+        Your Score: {score} / {totalQuestions} ({parseInt(score * 100 / totalQuestions)}%)
       </Typography>
 
       {incorrectQuestions.length > 0 && (
@@ -51,9 +51,7 @@ const ScoreReport = ({ score, totalQuestions, incorrectQuestions, answers, resta
         </Typography>
       )}
 
-      <Button variant="contained" onClick={restartQuiz}>
-        Restart Quiz
-      </Button>
+      <Button variant="contained" onClick={hide}>Resume</Button>
     </Box>
   );
 };

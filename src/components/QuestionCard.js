@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 const MainImagesPath = `${process.env.PUBLIC_URL}/kns_fotos`;
 
 
-const QuestionCard = ({ question, handleAnswer, selectedAnswer }) => {
+const QuestionCard = ({ question, handleAnswer, selectedAnswer, finished }) => {
   const imagePath = `${MainImagesPath}/${question.question_id}.jpeg`;
 
   
@@ -49,6 +49,7 @@ const QuestionCard = ({ question, handleAnswer, selectedAnswer }) => {
             variant={selectedAnswer === "A" ? "contained" : "outlined"}
             color="primary"
             fullWidth
+            disabled={finished}
             onClick={() => handleAnswer("A")}
           >
             {question.answer_a}
@@ -60,6 +61,7 @@ const QuestionCard = ({ question, handleAnswer, selectedAnswer }) => {
             variant={selectedAnswer === "B" ? "contained" : "outlined"}
             color="secondary"
             fullWidth
+            disabled={finished}
             onClick={() => handleAnswer("B")}
           >
             {question.answer_b}
