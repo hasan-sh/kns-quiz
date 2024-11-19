@@ -6,9 +6,9 @@ function App() {
   return (
     <>
       <CssBaseline />
-      <Container>
+      <Container style={{margin: "15px 0"}}>
         <Typography variant="h4" align="center" gutterBottom>
-          Kennis van Nederlandse Samenleving (KNS)
+          Kennis van de Nederlandse Samenleving (KNS)
         </Typography>
         <Quiz />
       </Container>

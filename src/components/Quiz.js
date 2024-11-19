@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Pagination, Box, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Pagination, Box, Button, FormControl, InputLabel, Select, MenuItem, PaginationItem } from "@mui/material";
 import questions from "../data/questions.json";
 import QuestionCard from "./QuestionCard";
 import ScoreReport from "./ScoreReport";
@@ -74,8 +74,8 @@ const Quiz = () => {
   const incorrectQuestions = getIncorrectQuestions();
 
   return (
-    <Box sx={{ mt: 4 }}>
-        <Box display="flex" justifyContent="center" gap={4} mb={4}>
+    <Box display="flex" flexDirection="column" gap={4} sx={{ mt: 4 }}>
+        <Box display="flex" justifyContent="center" gap={2}>
             <FormControl sx={{ width: 150 }}>
                 <InputLabel id="question-count-label">Questions</InputLabel>
                 <Select
@@ -124,31 +124,46 @@ const Quiz = () => {
             handleAnswer={handleAnswer}
             finished={showScore}
         />
-        <Box mt={4} display="flex" justifyContent="center">
-        <Pagination
-            count={randomQuestions.length}
-            page={currentQuestion + 1}
-            onChange={handlePageChange}
-            color="primary"
-            siblingCount={1}
-            boundaryCount={1}
-        />
-        </Box>
-        <Box display="flex" justifyContent="center" mt={2} gap={4} textAlign="center">
-            <Button
-                variant="contained"
-                color="warning"
-                onClick={restartQuiz}
-            >
-                Restart Quiz
-            </Button>
-            <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => setShowScore(true)}
-            >
-                Show Results
-            </Button>
+
+        <Box gap={1} display="flex" flexDirection="column" alignItems="center">
+          <Pagination
+              shape="rounded"
+              variant="outlined"
+              count={randomQuestions.length}
+              page={currentQuestion + 1}
+              onChange={handlePageChange}
+              siblingCount={1}
+              boundaryCount={1}
+              renderItem={(item) => {
+                const isAnswered = item.type === 'page' && answers[randomQuestions[item.page - 1]?.question_id];
+                return (
+                  <PaginationItem
+                    {...item}
+                    style={{
+                      fontWeight: isAnswered ? "bold" : "normal",
+                      backgroundColor: isAnswered || item.selected ? "#d1e7dd" : "inherit",
+                    }}
+                  />
+                );
+              }}
+          />
+
+          <Box display="flex" justifyContent="center" gap={2}>
+              <Button
+                  variant="contained"
+                  color="warning"
+                  onClick={restartQuiz}
+              >
+                  Restart Quiz
+              </Button>
+              <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => setShowScore(true)}
+              >
+                  Show Results
+              </Button>
+          </Box>
         </Box>
     </Box>
   );

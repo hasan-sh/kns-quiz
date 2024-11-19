@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Button } from "@mui/material";
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 
 const MainImagesPath = `${process.env.PUBLIC_URL}/kns_fotos`;
 
@@ -15,7 +15,6 @@ const QuestionCard = ({ question, handleAnswer, selectedAnswer, finished }) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        mt: 3,
         p: 2,
         border: "1px solid #ccc",
         borderRadius: "8px",
