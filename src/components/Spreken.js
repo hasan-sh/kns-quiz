@@ -19,6 +19,7 @@ const Spreken = () => {
     setSelectedQuestion(question);
     const response = await fetch("https://python-basisexamen.vercel.app/api", {
       method: "POST",
+      mode: "cors",
       headers: {
         "Content-Type": "application/json",
     },
