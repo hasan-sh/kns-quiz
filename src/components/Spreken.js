@@ -17,11 +17,10 @@ const Spreken = () => {
   const fetchAnswers = async (question) => {
     setLoading(true);
     setSelectedQuestion(question);
-    const response = await fetch(process.env.REACT_APP_VERCEL_PROD, {
+    const response = await fetch("https://python-basisexamen.vercel.app/api", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-vercel-protection-bypass": process.env.REACT_APP_VERCEL_AUTOMATION_BYPASS_SECRET
     },
       body: JSON.stringify({ question }),
     });
