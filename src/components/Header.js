@@ -10,7 +10,7 @@ const Header = () => {
                     <Typography variant="h6" style={{ flexGrow: 1 }}>
                         Het Basisexamen
                     </Typography>
-                    <Button color="inherit" component={Link} to="/">
+                    <Button color="inherit" component={Link} to="/kns">
                         KNS
                     </Button>
                     <Button color="inherit" component={Link} to="/spreken">
