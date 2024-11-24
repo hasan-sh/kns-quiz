@@ -16,7 +16,7 @@ const KnsCard = ({ question, handleAnswer, selectedAnswer, finished }) => {
           alt={question.question_text}
           sx={{
             width: "100%",
-            height: 200,
+            height: 400,
             objectFit: "contain",
           }}
         />
