@@ -199,7 +199,7 @@ const SprekenQuiz = () => {
         </Button>
       </Box>
 
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 5, mt: 2 }}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 5, mt: 2 }}>
         {/* Left Column: Question */}
         <Box
           sx={{
@@ -242,7 +242,7 @@ const SprekenQuiz = () => {
             sx={{ mb: 2 }}
           />
 
-          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+          <Stack direction="row" sx={{ flexWrap: "wrap", gap: 2 }}>
             <Button
               variant="contained"
               color="success"
@@ -268,7 +268,7 @@ const SprekenQuiz = () => {
               disabled={recordingStatus === "recording"}
               startIcon={<SendIcon />}
             >
-              Verzenden
+              Check
             </Button>
           </Stack>
 
