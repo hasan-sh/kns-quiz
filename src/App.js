@@ -2,10 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { CssBaseline, Container, Typography } from "@mui/material";
 
-import Quiz from "./components/Quiz";
+import KnsQuiz from "./components/KnsQuiz";
 import Header from './components/Header';
-import Spreken from "./components/SprekenCard";
-import StructuredQuiz from "./components/Spreken";
+import SprekenQuiz from "./components/Spreken";
 
 function App() {
   return (
@@ -15,8 +14,8 @@ function App() {
           <Header />  {/* Display Header on all pages */}
             <Routes>
                 <Route path="/" element={<Navigate to="/kns" replace />}/>
-                <Route path="/kns" element={<Quiz type="kns"/>} />
-                <Route path="/spreken" element={<StructuredQuiz />} />
+                <Route path="/kns" element={<KnsQuiz />} />
+                <Route path="/spreken" element={<SprekenQuiz />} />
             </Routes>
         </Router>
     </>

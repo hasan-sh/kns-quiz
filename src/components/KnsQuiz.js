@@ -3,7 +3,6 @@ import { Pagination, Box, Button, FormControl, InputLabel, Select, MenuItem, Pag
 import Grid from '@mui/material/Grid2';
 import KnsCard from "./KnsCard";
 import ScoreReport from "./ScoreReport";
-import SprekenCard from "./SprekenCard";
 
 // Shuffle questions and pick a random subset
 const getRandomQuestions = (num, questions, randomize=true) => {
@@ -12,9 +11,9 @@ const getRandomQuestions = (num, questions, randomize=true) => {
 };
 
 
-const DataPath = `${process.env.PUBLIC_URL}/data`;
+const DataPath = `${process.env.PUBLIC_URL}/data/questions.json`;
 
-const Quiz = ({type}) => {
+const Quiz = () => {
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({});
   const [showScore, setShowScore] = useState(false);
@@ -23,16 +22,15 @@ const Quiz = ({type}) => {
   const [questions, setQuestions] = useState([]);
   const [randomQuestions, setRandomQuestions] = useState([]);
 
-  const jsonFile = type === "kns" ? `${DataPath}/questions.json` : `${DataPath}/spreken_questions.json`;
 
   useEffect(() => {
-    fetch(jsonFile, { headers: { "Content-Type": "application/json" } })
+    fetch(DataPath, { headers: { "Content-Type": "application/json" } })
       .then((res) => res.json())
       .then((data) => {
         setRandomQuestions(getRandomQuestions(selectedNumberOfQuestions, data, randomizeQuestions));
         setQuestions(data);
       });
-  }, [jsonFile]);
+  }, []);
 
   const restartQuiz = () => {
     if (!randomQuestions.length) return;
@@ -138,13 +136,12 @@ const Quiz = ({type}) => {
         />}
 
         <Grid container spacing={2} justifyContent="center">
-          {type === "kns" ? <KnsCard
+           <KnsCard
               question={currentQuestion}
               selectedAnswer={answers[currentQuestion.question_id] || ""}
               handleAnswer={handleAnswer}
               finished={showScore}
-          /> :
-          <SprekenCard question={typeof currentQuestion === "string" && currentQuestion} />}
+          />
         </Grid>
 
         <Box gap={1} display="flex" flexDirection="column" alignItems="center">
