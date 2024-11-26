@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Box, Typography, PaginationItem, TextField, Modal, Stack, CircularProgress } from "@mui/material";
+import { Button, Box, Typography, PaginationItem, TextField, Modal, Stack, CircularProgress, useMediaQuery } from "@mui/material";
 
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
@@ -28,6 +28,9 @@ const SprekenQuiz = () => {
   const [audioChunks, setAudioChunks] = useState(null);
   const [loadingSpeech, setLoadingSpeech] = useState(false);
   const [loadingAnswers, setLoadingAnswers] = useState(false);
+
+
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
     fetch(DataPath, { headers: { "Content-Type": "application/json" } })
@@ -199,7 +202,7 @@ const SprekenQuiz = () => {
         </Button>
       </Box>
 
-      <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 5, mt: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: isSmallScreen ? "column" : "row", justifyContent: "center", gap: 5, mt: 2 }}>
         {/* Left Column: Question */}
         <Box
           sx={{
@@ -272,21 +275,20 @@ const SprekenQuiz = () => {
             </Button>
           </Stack>
 
-        <Modal open={loadingAnswers} onClose={() => setLoadingSpeech(false)}>
-              <Box display="flex" justifyContent="center" alignItems="center"
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 400,
-                  borderRadius: 2,
-                  p: 4,
-                }}
-              >
-                <CircularProgress sx={{color: "white"}} size={100}/>
-              </Box>
-        </Modal>
+          {/* Recording Status */}
+          {recordingStatus === "recording" && (
+            <Typography color="success.main">Bezig met opnemen...</Typography>
+          )}
+          {recordingStatus === "stopped" && (
+            <Typography color="warning.main">Opname gestopt, klaar om te verzenden.</Typography>
+          )}
+          {recordingStatus === "sending" && (
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CircularProgress size={20} />
+              <Typography>Klaar om te verzenden...</Typography>
+            </Stack>
+          )}
+
 
 
           {answers[`${currentSet}-${currentQuestionIndex}-ai`] && (
@@ -312,19 +314,6 @@ const SprekenQuiz = () => {
             </Box>
           )}
 
-          {/* Recording Status */}
-          {recordingStatus === "recording" && (
-            <Typography color="success.main">Bezig met opnemen...</Typography>
-          )}
-          {recordingStatus === "stopped" && (
-            <Typography color="warning.main">Opname gestopt, klaar om te verzenden.</Typography>
-          )}
-          {recordingStatus === "sending" && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <CircularProgress size={20} />
-              <Typography>Klaar om te verzenden...</Typography>
-            </Stack>
-          )}
         </Box>
       </Box>
 
@@ -348,6 +337,21 @@ const SprekenQuiz = () => {
         </Button>
       </Stack>
 
+      <Modal open={loadingAnswers} onClose={() => setLoadingSpeech(false)}>
+            <Box display="flex" justifyContent="center" alignItems="center"
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 400,
+                borderRadius: 2,
+                p: 4,
+              }}
+            >
+              <CircularProgress sx={{color: "white"}} size={100}/>
+            </Box>
+      </Modal>
 
       {/* Score Modal */}
       <Modal open={showScoreModal} onClose={() => setShowScoreModal(false)}>
