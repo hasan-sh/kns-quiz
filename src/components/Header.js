@@ -16,6 +16,9 @@ const Header = () => {
                     <Button color="inherit" component={Link} to="/spreken">
                         Spreken
                     </Button>
+                    <Button color="inherit" component={Link} to="/verbs-and-phrases">
+                        Verbs&Phrases
+                    </Button>
                 </Toolbar>
             </Container>
         </AppBar>

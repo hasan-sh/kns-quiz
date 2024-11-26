@@ -5,6 +5,7 @@ import { CssBaseline, Container, Typography } from "@mui/material";
 import KnsQuiz from "./components/KnsQuiz";
 import Header from './components/Header';
 import SprekenQuiz from "./components/Spreken";
+import VerbsAndPhrases from "./components/VerbsAndPhrases";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
                 <Route path="/" element={<Navigate to="/kns" replace />}/>
                 <Route path="/kns" element={<KnsQuiz />} />
                 <Route path="/spreken" element={<SprekenQuiz />} />
+                <Route path="/verbs-and-phrases" element={<VerbsAndPhrases />} />
             </Routes>
         </Router>
     </>

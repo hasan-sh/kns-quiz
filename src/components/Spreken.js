@@ -25,7 +25,7 @@ const SprekenQuiz = () => {
   const [score, setScore] = useState(0);
   const [recordingStatus, setRecordingStatus] = useState("idle"); // "idle", "recording", "stopped", "sending"
   const [recorder, setRecorder] = useState(null);
-  const [audioChunks, setAudioChunks] = useState([]);
+  const [audioChunks, setAudioChunks] = useState(null);
   const [loadingSpeech, setLoadingSpeech] = useState(false);
   const [loadingAnswers, setLoadingAnswers] = useState(false);
 
@@ -39,20 +39,27 @@ const SprekenQuiz = () => {
       });
   }, []);
   
-  const fetchAnswers = async () => {
+  const fetchAnswers = async (formData) => {
     setLoadingAnswers(true);
     const question = combinedQuestions[currentQuestionIndex];
     
     try {
+      formData.append("question", question);
+      formData.append("userAnswer", answers[`${currentSet}-${currentQuestionIndex}-input`] || "");
+
       const response = await fetch(SERVER_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ question, userAnswer: answers[`${currentSet}-${currentQuestionIndex}-input`] || "" }),
+        body: formData,
       });
       const data = await response.json();
-      handleAnswerChange({ answers: data.answers, score: data.correctnessScore, explanation: data.explanation }, "ai")
+      handleAnswerChange({ 
+        answers: data.answers,
+        score: data.correctnessScore,
+        explanation: data.explanation,
+      }, "ai")
+      if (data.transcription) {
+        handleAnswerChange(data.transcription, "input")
+      }
       setLoadingAnswers(false);
     } catch (error) {
       // setLoading(false);
@@ -92,7 +99,7 @@ const SprekenQuiz = () => {
     const newRecorder = new MediaRecorder(stream);
 
     newRecorder.ondataavailable = (event) => {
-      setAudioChunks((prev) => [...prev, event.data]);
+      setAudioChunks(event.data);
     };
 
     newRecorder.start();
@@ -109,11 +116,12 @@ const SprekenQuiz = () => {
   const sendRecording = async () => {
     setRecordingStatus("sending");
 
-    const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
     const formData = new FormData();
-    formData.append("audio", audioBlob);
+    if (audioChunks) {
+      formData.append("audio", audioChunks, "audio.wav");
+    }
 
-    fetchAnswers();
+    fetchAnswers(formData);
     setRecordingStatus("idle");
   };
 
