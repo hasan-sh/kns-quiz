@@ -19,7 +19,7 @@ const Quiz = ({type}) => {
   const [answers, setAnswers] = useState({});
   const [showScore, setShowScore] = useState(false);
   const [selectedNumberOfQuestions, setSelectedNumberOfQuestions] = useState(20);
-  const [randomizeQuestions, setRandomizeQuestions] = useState(1);
+  const [randomizeQuestions, setRandomizeQuestions] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [randomQuestions, setRandomQuestions] = useState([]);
 
