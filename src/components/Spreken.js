@@ -100,7 +100,7 @@ const SprekenQuiz = () => {
 
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const newRecorder = new MediaRecorder(stream);
-
+    
     newRecorder.ondataavailable = (event) => {
       setAudioChunks(event.data);
     };
@@ -112,6 +112,7 @@ const SprekenQuiz = () => {
   const stopRecording = () => {
     if (recorder) {
       recorder.stop();
+      recorder.stream.getTracks().forEach(t => t.stop());
       setRecordingStatus("stopped");
     }
   };
@@ -186,7 +187,7 @@ const SprekenQuiz = () => {
               m: 0,
               width: 10,
               borderColor: index < 12 ? "red" : "blue",
-              background: index === currentQuestionIndex ? "#ddd" : "inherit",
+              background: index === currentQuestionIndex ? "#ddd !important" : "inherit",
             }}
           >
             {index + 1}
