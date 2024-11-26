@@ -213,8 +213,8 @@ const SprekenQuiz = () => {
             backgroundColor: "#f9f9f9",
           }}
         >
-          <Typography variant="h5" sx={{ mb: 2 }}>{partTitle}</Typography>
-          <Typography variant="h6">{currentQuestion}</Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>{partTitle}</Typography>
+          <Typography variant="h5">{currentQuestion}</Typography>
             <Button
               variant="outlined"
               sx={{ mt: 2 }}
