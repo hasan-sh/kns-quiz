@@ -25,7 +25,6 @@ const SprekenQuiz = () => {
   const [score, setScore] = useState(0);
   const [recordingStatus, setRecordingStatus] = useState("idle"); // "idle", "recording", "stopped", "sending"
   const [recorder, setRecorder] = useState(null);
-  const [audioChunks, setAudioChunks] = useState(null);
   const [loadingSpeech, setLoadingSpeech] = useState(false);
   const [loadingAnswers, setLoadingAnswers] = useState(false);
 
@@ -41,6 +40,7 @@ const SprekenQuiz = () => {
         setSecondPartQuestions(data.second_part);
       });
   }, []);
+
   
   const fetchAnswers = async (formData) => {
     setLoadingAnswers(true);
@@ -63,6 +63,7 @@ const SprekenQuiz = () => {
       if (data.transcription) {
         handleAnswerChange(data.transcription, "input")
       }
+
       setLoadingAnswers(false);
     } catch (error) {
       // setLoading(false);
@@ -70,7 +71,6 @@ const SprekenQuiz = () => {
       setLoadingAnswers(false);
     }
   };
-
 
 
   const handleSetChanges = (incrementBy=1) => {
@@ -102,7 +102,7 @@ const SprekenQuiz = () => {
     const newRecorder = new MediaRecorder(stream);
     
     newRecorder.ondataavailable = (event) => {
-      setAudioChunks(event.data);
+      handleAnswerChange(event.data, "audio")
     };
 
     newRecorder.start();
@@ -117,10 +117,11 @@ const SprekenQuiz = () => {
     }
   };
 
-  const sendRecording = async () => {
+  const sendRequest = async () => {
     setRecordingStatus("sending");
 
     const formData = new FormData();
+    const audioChunks = answers[`${currentSet}-${currentQuestionIndex}-audio`];
     if (audioChunks) {
       formData.append("audio", audioChunks, "audio.wav");
     }
@@ -154,17 +155,12 @@ const SprekenQuiz = () => {
   const isFirstPart = currentQuestionIndex < firstPartSet.length;
   const partTitle = isFirstPart ? "Deel 1: Beantwoord de vraag" : "Deel 2: Vul de zin aan";
 
-
   return (
     <Box sx={{ p: 3 }}>
       {/* Title */}
       <Typography variant="body1" sx={{ mb: 3, textAlign: "center" }}>
         Examen #{currentSet + 1}
       </Typography>
-
-      {/* Next Set Button */}
-      <Box display="flex" justifyContent="space-around">
-      </Box>
 
       {/* Pagination */}
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: .5, justifyContent: "center", mt: 1 }}>
@@ -268,7 +264,7 @@ const SprekenQuiz = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={sendRecording}
+              onClick={sendRequest}
               disabled={recordingStatus === "recording"}
               startIcon={<SendIcon />}
             >
