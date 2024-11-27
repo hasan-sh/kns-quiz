@@ -14,6 +14,16 @@ if (process.env.NODE_ENV === "development") {
   SERVER_URL = "http://127.0.0.1:5000/api";
 }
 
+const filterAudioKeys = (answers) => {
+  const filtered = {};
+  for (const key in answers) {
+    if (!key.includes("audio")) {
+      filtered[key] = answers[key];
+    }
+  }
+  return filtered;
+};
+
 
 const SprekenQuiz = () => {
   const [firstPartQuestions, setFirstPartQuestions] = useState([]);
@@ -39,7 +49,19 @@ const SprekenQuiz = () => {
         setFirstPartQuestions(data.first_part);
         setSecondPartQuestions(data.second_part);
       });
+
+      // Initialize answers state from localStorage if available
+      const savedAnswers = localStorage.getItem("answers");
+      if (savedAnswers) {
+        setAnswers(JSON.parse(savedAnswers));
+      }
   }, []);
+
+  useEffect(() => {
+    // Save answers to localStorage whenever it changes
+    const filteredAnswers = filterAudioKeys(answers);
+    localStorage.setItem("answers", JSON.stringify(filteredAnswers));
+  }, [answers]);
 
   
   const fetchAnswers = async (formData) => {
@@ -268,7 +290,7 @@ const SprekenQuiz = () => {
               disabled={recordingStatus === "recording"}
               startIcon={<SendIcon />}
             >
-              Check
+              {answers[`${currentSet}-${currentQuestionIndex}-ai`] ? "Retry" : "Check"}
             </Button>
           </Stack>
 
