@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Box, Typography, PaginationItem, TextField, Modal, Stack, CircularProgress, useMediaQuery, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
@@ -26,9 +27,13 @@ const filterAudioKeys = (answers) => {
 
 
 const SprekenQuiz = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+
   const [questions, setQuestions] = useState([]);
-  const [currentSet, setCurrentSet] = useState(0);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentSet, setCurrentSet] = useState(Number(queryParams.get("currentSet")) || 0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(Number(queryParams.get("currentQuestionIndex")) || 0);
   const [answers, setAnswers] = useState({});
   const [questionsFinished, setQuestionsFinished] = useState(false);
   const [recordingStatus, setRecordingStatus] = useState("idle"); // "idle", "recording", "stopped", "sending"
@@ -72,6 +77,14 @@ const SprekenQuiz = () => {
     const filteredAnswers = filterAudioKeys(answers);
     localStorage.setItem("answers", JSON.stringify(filteredAnswers));
   }, [answers]);
+
+  // Update the URL query parameters when state changes
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set("currentSet", currentSet);
+    params.set("currentQuestionIndex", currentQuestionIndex);
+    navigate(`?${params.toString()}`, { replace: true });
+  }, [currentSet, currentQuestionIndex]);
 
   
   const fetchAnswers = async (formData) => {
@@ -237,12 +250,19 @@ const SprekenQuiz = () => {
         </Button>
       </Box>
 
-      <Box sx={{ display: "flex", flexDirection: isSmallScreen ? "column" : "row", justifyContent: "center", gap: 5, mt: 2 }}>
+      <Box sx={{ display: "flex",
+        flexDirection: isSmallScreen ? "column" : "row",
+        justifyContent: "center",
+        gap: 5,
+        mt: 2,
+        minHeight: 400,
+        }}>
         {/* Left Column: Question */}
         <Box
           sx={{
             flex: 1,
             p: 2,
+            alignItems: "space-between",
             border: "1px solid #ccc",
             borderRadius: "8px",
             backgroundColor: "#f9f9f9",
@@ -332,6 +352,7 @@ const SprekenQuiz = () => {
                 borderRadius: 2,
                 boxShadow: 2,
                 p: 4,
+                mt: 1,
               }}
             >
                 <Typography variant="caption" sx={{ mb: 2 }}>
