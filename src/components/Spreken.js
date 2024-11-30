@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Box, Typography, PaginationItem, TextField, Modal, Stack, CircularProgress, useMediaQuery } from "@mui/material";
+import { Button, Box, Typography, PaginationItem, TextField, Modal, Stack, CircularProgress, useMediaQuery, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
@@ -26,8 +26,7 @@ const filterAudioKeys = (answers) => {
 
 
 const SprekenQuiz = () => {
-  const [firstPartQuestions, setFirstPartQuestions] = useState([]);
-  const [secondPartQuestions, setSecondPartQuestions] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const [currentSet, setCurrentSet] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -44,9 +43,21 @@ const SprekenQuiz = () => {
     fetch(DataPath, { headers: { "Content-Type": "application/json" } })
       .then((res) => res.json())
       .then((data) => {
-        // Randomly shuffle questions
-        setFirstPartQuestions(data.first_part);
-        setSecondPartQuestions(data.second_part);
+        const combinedQuestions = [];
+        const minLength = Math.min(data.first_part.length, data.second_part.length);
+
+        // Loop through the minimum length of both parts and add 12 questions at a time
+        for (let i = 0; i < minLength; i += 12) {
+          combinedQuestions.push(
+            ...data.first_part.slice(i, i + 12),
+            ...data.second_part.slice(i, i + 12)
+          );
+        }
+        // Add the remaining questions from both parts (if any)
+        combinedQuestions.push(...data.first_part.slice(minLength));
+        combinedQuestions.push(...data.second_part.slice(minLength));
+        // Set the state with the combined questions
+        setQuestions(combinedQuestions);
       });
 
       // Initialize answers state from localStorage if available
@@ -96,7 +107,7 @@ const SprekenQuiz = () => {
 
   const handleSetChanges = (incrementBy=1, sliceFrom) => {
     const nextSetIndex = currentSet + incrementBy;
-    if (incrementBy > 0 && sliceFrom >= secondPartQuestions.length) {
+    if (nextSetIndex * 24 >= questions.length) {
       setQuestionsFinished(true);
     } else {
       setCurrentSet(nextSetIndex);
@@ -165,29 +176,29 @@ const SprekenQuiz = () => {
     utterance.onend = () => setLoadingSpeech(false);
   };
 
-  let startSliceFrom = currentSet * 12;
-  const firstPartSet = firstPartQuestions.slice(startSliceFrom, startSliceFrom + 12);
-  let secondPartSet = secondPartQuestions.slice(startSliceFrom, startSliceFrom + 12);
-  let combinedQuestions = [...firstPartSet, ...secondPartSet];
-  // secondPart is always more than firstPart
-  if (combinedQuestions.length !== 24) {
-    const remainingNeeded = 24 - combinedQuestions.length;
-    startSliceFrom += firstPartSet.length;
-    secondPartSet = secondPartQuestions.slice(startSliceFrom, startSliceFrom + remainingNeeded);
-    combinedQuestions.push(...secondPartSet);
-    startSliceFrom += remainingNeeded;
-  }
+  const combinedQuestions = questions.slice(currentSet * 24, currentSet * 24 + 24)
   const currentQuestion = combinedQuestions[currentQuestionIndex];
-
-  const isFirstPart = currentQuestionIndex < firstPartSet.length;
-  const partTitle = isFirstPart ? "Deel 1: Beantwoord de vraag" : "Deel 2: Vul de zin aan";
 
   return (
     <Box sx={{ p: 3 }}>
       {/* Title */}
-      <Typography variant="body1" sx={{ mb: 3, textAlign: "center" }}>
-        Examen #{currentSet + 1}
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "center", }}>
+        <FormControl variant="outlined" sx={{ minWidth: 120, mb: 3, textAlign: "center" }}>
+          <InputLabel id="set-selector-label">Examen</InputLabel>
+          <Select
+            labelId="set-selector-label"
+            id="set-selector"
+            value={currentSet}
+            onChange={(event) => setCurrentSet(event.target.value)} // Update the currentSet state
+            label="Examen"
+          >
+            {Array.from({ length: Math.ceil(questions.length / 24) }, (_, index) => (
+              <MenuItem key={index} value={index}>{index + 1}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
 
       {/* Pagination */}
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: .5, justifyContent: "center", mt: 1 }}>
@@ -196,7 +207,7 @@ const SprekenQuiz = () => {
           color="primary" 
           disabled={currentSet === 0}
           startIcon={<NavigateBeforeIcon />}
-          onClick={() => handleSetChanges(-1, startSliceFrom)}>
+          onClick={() => handleSetChanges(-1)}>
           Vorige Set
         </Button>
         {combinedQuestions.map((_, index) => (
@@ -221,7 +232,7 @@ const SprekenQuiz = () => {
           color="primary" 
           disabled={questionsFinished}
           endIcon={<NavigateNextIcon />}
-          onClick={() => handleSetChanges(1, startSliceFrom)}>
+          onClick={() => handleSetChanges(1)}>
           Volgende Set
         </Button>
       </Box>
@@ -237,7 +248,7 @@ const SprekenQuiz = () => {
             backgroundColor: "#f9f9f9",
           }}
         >
-          <Typography variant="body1" sx={{ mb: 2 }}>{partTitle}</Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>Vraag</Typography>
           <Typography variant="h5">{currentQuestion}</Typography>
             <Button
               variant="outlined"
