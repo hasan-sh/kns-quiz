@@ -31,8 +31,7 @@ const SprekenQuiz = () => {
   const [currentSet, setCurrentSet] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [showScoreModal, setShowScoreModal] = useState(false);
-  const [score, setScore] = useState(0);
+  const [questionsFinished, setQuestionsFinished] = useState(false);
   const [recordingStatus, setRecordingStatus] = useState("idle"); // "idle", "recording", "stopped", "sending"
   const [recorder, setRecorder] = useState(null);
   const [loadingSpeech, setLoadingSpeech] = useState(false);
@@ -95,17 +94,14 @@ const SprekenQuiz = () => {
   };
 
 
-  const handleSetChanges = (incrementBy=1) => {
+  const handleSetChanges = (incrementBy=1, sliceFrom) => {
     const nextSetIndex = currentSet + incrementBy;
-
-    const totalQuestions = Math.max(firstPartQuestions.length, secondPartQuestions.length);
-    if (nextSetIndex * 12 >= totalQuestions) {
-      const totalScore = Object.values(answers).filter(Boolean).length;
-      setScore(totalScore);
-      setShowScoreModal(true);
+    if (incrementBy > 0 && sliceFrom >= secondPartQuestions.length) {
+      setQuestionsFinished(true);
     } else {
       setCurrentSet(nextSetIndex);
       setCurrentQuestionIndex(0);
+      setQuestionsFinished(false);
     }
   };
 
@@ -169,9 +165,18 @@ const SprekenQuiz = () => {
     utterance.onend = () => setLoadingSpeech(false);
   };
 
-  const firstPartSet = firstPartQuestions.slice(currentSet * 12, currentSet * 12 + 12);
-  const secondPartSet = secondPartQuestions.slice(currentSet * 12, currentSet * 12 + 12);
-  const combinedQuestions = [...firstPartSet, ...secondPartSet];
+  let startSliceFrom = currentSet * 12;
+  const firstPartSet = firstPartQuestions.slice(startSliceFrom, startSliceFrom + 12);
+  let secondPartSet = secondPartQuestions.slice(startSliceFrom, startSliceFrom + 12);
+  let combinedQuestions = [...firstPartSet, ...secondPartSet];
+  // secondPart is always more than firstPart
+  if (combinedQuestions.length !== 24) {
+    const remainingNeeded = 24 - combinedQuestions.length;
+    startSliceFrom += firstPartSet.length;
+    secondPartSet = secondPartQuestions.slice(startSliceFrom, startSliceFrom + remainingNeeded);
+    combinedQuestions.push(...secondPartSet);
+    startSliceFrom += remainingNeeded;
+  }
   const currentQuestion = combinedQuestions[currentQuestionIndex];
 
   const isFirstPart = currentQuestionIndex < firstPartSet.length;
@@ -191,7 +196,7 @@ const SprekenQuiz = () => {
           color="primary" 
           disabled={currentSet === 0}
           startIcon={<NavigateBeforeIcon />}
-          onClick={() => handleSetChanges(-1)}>
+          onClick={() => handleSetChanges(-1, startSliceFrom)}>
           Vorige Set
         </Button>
         {combinedQuestions.map((_, index) => (
@@ -214,9 +219,9 @@ const SprekenQuiz = () => {
         <Button 
           variant="contained" 
           color="primary" 
-          disabled={currentSet === combinedQuestions.length - 1}
+          disabled={questionsFinished}
           endIcon={<NavigateNextIcon />}
-          onClick={() => handleSetChanges()}>
+          onClick={() => handleSetChanges(1, startSliceFrom)}>
           Volgende Set
         </Button>
       </Box>
@@ -372,21 +377,6 @@ const SprekenQuiz = () => {
             </Box>
       </Modal>
 
-      {/* Score Modal */}
-      <Modal open={showScoreModal} onClose={() => setShowScoreModal(false)}>
-        <Box sx={{ p: 3, backgroundColor: "white", mx: "auto", mt: "10%", maxWidth: 400 }}>
-          <Typography variant="h5">Quiz Voltooid!</Typography>
-          <Typography variant="body1">{`Uw Score: ${score}`}</Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setShowScoreModal(false)}
-            sx={{ mt: 2 }}
-          >
-            Sluiten
-          </Button>
-        </Box>
-      </Modal>
     </Box>
   );
 };
