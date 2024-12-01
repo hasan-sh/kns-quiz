@@ -25,15 +25,18 @@ const filterAudioKeys = (answers) => {
   return filtered;
 };
 
+const parseParam = (params, name) => {
+  return Number(params.get(name)) ? Number(params.get(name)) - 1 : 1
+}
 
 const SprekenQuiz = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
+  const params = new URLSearchParams(location.search);
 
   const [questions, setQuestions] = useState([]);
-  const [currentSet, setCurrentSet] = useState(Number(queryParams.get("currentSet")) || 0);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(Number(queryParams.get("currentQuestionIndex")) || 0);
+  const [currentSet, setCurrentSet] = useState(parseParam(params, "examen"));
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(parseParam(params, "vraag"));
   const [answers, setAnswers] = useState({});
   const [questionsFinished, setQuestionsFinished] = useState(false);
   const [recordingStatus, setRecordingStatus] = useState("idle"); // "idle", "recording", "stopped", "sending"
@@ -81,8 +84,8 @@ const SprekenQuiz = () => {
   // Update the URL query parameters when state changes
   useEffect(() => {
     const params = new URLSearchParams();
-    params.set("currentSet", currentSet);
-    params.set("currentQuestionIndex", currentQuestionIndex);
+    params.set("examen", currentSet + 1);
+    params.set("vraag", currentQuestionIndex + 1);
     navigate(`?${params.toString()}`, { replace: true });
   }, [currentSet, currentQuestionIndex]);
 
@@ -191,6 +194,10 @@ const SprekenQuiz = () => {
 
   const combinedQuestions = questions.slice(currentSet * 24, currentSet * 24 + 24)
   const currentQuestion = combinedQuestions[currentQuestionIndex];
+
+  if (!questions.length) {
+    return null
+  }
 
   return (
     <Box sx={{ p: 3 }}>
@@ -355,12 +362,16 @@ const SprekenQuiz = () => {
                 mt: 1,
               }}
             >
-                <Typography variant="caption" sx={{ mb: 2 }}>
-                  Correctness Score: {answers[`${currentSet}-${currentQuestionIndex}-ai`].score}%
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 2 }}>
-                {answers[`${currentSet}-${currentQuestionIndex}-ai`].explanation}
-              </Typography>
+                {(answers[`${currentSet}-${currentQuestionIndex}-input`] || answers[`${currentSet}-${currentQuestionIndex}-audio`]) && (
+                  <>
+                    <Typography variant="caption" sx={{ mb: 2 }}>
+                      Correctness Score: {answers[`${currentSet}-${currentQuestionIndex}-ai`].score}%
+                    </Typography>
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                      {answers[`${currentSet}-${currentQuestionIndex}-ai`].explanation}
+                    </Typography>
+                  </>
+                )}
               <Typography variant="h6">Top 3 Answers:</Typography>
               <ul>
                 {answers[`${currentSet}-${currentQuestionIndex}-ai`].answers.map((answer, idx) => (
