@@ -10,7 +10,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 
 const DataPath = `${process.env.PUBLIC_URL}/data/spreken_questions.json`;
-let SERVER_URL = "https://python-basisexamen-mahhzgk47-hasans-projects-5b8f83c9.vercel.app/api";
+let SERVER_URL = "https://python-basisexamen.vercel.app/api";
 if (process.env.NODE_ENV === "development") {
   SERVER_URL = "http://127.0.0.1:5000/api";
 }
